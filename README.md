@@ -16,7 +16,7 @@ Binary map format:
 
       10 10                    // map size width x height -- 2 bytes     : 16,16 
 
-      20                       // map data length         -- 1 byte      : 32
+      20 00                    // map data length(16 bit) -- 2 byte      : 32
       FF FF 80 0D  B7 51 B5 65 // map data 
       E5 0D DC B1  98 55 A3 D3 //    a bit set to 1 represents a wall
       87 59 B1 4D  94 54 D3 95 //    a bit set to 0 represents a path
