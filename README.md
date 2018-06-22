@@ -19,8 +19,8 @@ Binary map format:
       20 00                    // map data length(16 bit) -- 2 byte      : 32
       FF FF 80 0D  B7 51 B5 65 // map data (MSb first, packed)
       E5 0D DC B1  98 55 A3 D3 //    a bit set to 1 represents a wall
-      87 59 B1 4D  94 54 D3 95 //    a bit set to 0 represents a path
-      99 11 B7 ED  80 01 FF FF //    note: one can not travel diagonally
+      87 59 B1 4D  94 55 D3 95 //    a bit set to 0 represents a path
+      88 11 B7 ED  80 01 FF FF //    note: one can not travel diagonally
 
       01 01                    // start x,y position      -- 2 bytes     : 1,1
 
@@ -36,7 +36,7 @@ Binary map format:
 
                                // item 1
       02                       // warp                    -- 4 bytes     : warp 
-      0B 0A                    //    x,y position on the map             : 12,10
+      0C 0A                    //    x,y position on the map             : 12,10
       01 01                    //    x,y warp destination                : 1,1
 
 ```
