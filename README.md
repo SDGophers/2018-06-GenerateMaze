@@ -93,20 +93,21 @@ Map:
 
  * Render the map to an image.
 
-## Challenge 2: Maze Solver
+## Challenge 2: Maze Generation
+
+* Modify the above program to generate a random maze.
+* Modify the above program to report if the maze is invalid.
+
+
+## Challenge 3: Maze Solver
 
 * Return the solution of the given map as a set of instructions.
 * Create an animated gif showing the how to solve the map
 
-## Challenge 3: Maze Generation
-
-* Modify the above program to generate a random maze.
-* Modify the above program to report if the maze is invalid.
 
 ## Challenge 4: Maze Validation
 
 * In addition to the above validation, make sure there is a solution (a first don't worry about maps with warps).
 * Make sure there is only one solution to a map.
 * Be able to deal with maps with Warps.
-
 
