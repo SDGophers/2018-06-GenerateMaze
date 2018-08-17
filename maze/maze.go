@@ -23,6 +23,8 @@ const (
 	MagicNumber1 = 0x5d
 	MagicNumber2 = 0x90
 	FileVersion  = 1
+	MSb          = 0x80 // Most sigficent bit -- 1000_0000
+
 )
 
 const (
@@ -38,6 +40,12 @@ const (
 	itemRequiredGoal = 0
 	itemOptionalGoal = 1
 	itemWarp         = 2
+)
+
+var (
+	ErrInvalidMapNotLargeEnough = errors.New("invalid map, not big enough")
+	ErrInvalidMapNotEnoughData  = errors.New("invalid map, not enough data")
+	ErrInvalidMapInvalidStart   = errors.New("invalid map, start location")
 )
 
 type item struct {
@@ -78,8 +86,11 @@ func ReadMap(r io.Reader) (*Map, error) {
 		return nil, errors.New("Bad magic or version number.")
 	}
 	wl, hl := bytes[headerWidth], bytes[headerHeight]
-	if (int(wl) * int(hl)) <= 1 {
-		return nil, errors.New("invalid map, not big enough.")
+
+	areaInBits := int(wl) * int(hl)
+
+	if areaInBits <= 1 {
+		return nil, ErrInvalidMapNotLargeEnough
 	}
 
 	// Lets read the values of the map
@@ -87,8 +98,11 @@ func ReadMap(r io.Reader) (*Map, error) {
 	if err = binary.Read(r, bom, &n); err != nil {
 		return nil, err
 	}
-	if int(wl)*int(hl) > int(n)*8 {
-		return nil, errors.New("invalid map, not enough map data.")
+
+	dataInBits := int(n) * 8
+
+	if areaInBits > dataInBits {
+		return nil, ErrInvalidMapNotEnoughData
 	}
 
 	var mdata = make([]byte, int(n))
@@ -106,9 +120,12 @@ func ReadMap(r io.Reader) (*Map, error) {
 	for _, b := range mdata {
 		// each byte contains 8 items.
 		for j := uint(0); j < 8; j++ {
-			if (b<<j)&0x80 != 0 {
+
+			// Check to see if the the most sigificent bit is set.
+			if (b<<j)&MSb != 0 {
 				m.tiles[m.idxFor(w, h)] = wall
 			}
+
 			w++
 			if w >= wl {
 				w, h = 0, h+1
@@ -119,7 +136,7 @@ func ReadMap(r io.Reader) (*Map, error) {
 		return nil, err
 	}
 	if m.tiles[m.idxFor(m.start[0], m.start[1])] != path {
-		return nil, errors.New("invalid start location.")
+		return nil, ErrInvalidMapInvalidStart
 	}
 	m.tiles[m.idxFor(m.start[0], m.start[1])] = start
 
@@ -177,21 +194,15 @@ func (m *Map) String() string {
 			switch m.tiles[idx] {
 			case path:
 				val.WriteRune(' ')
-				//val.WriteRune(' ')
 			case wall:
 				val.WriteRune('█')
-				//val.WriteRune('█')
 			case start:
-				//val.WriteRune('🦆')
 				val.WriteRune('S')
 			case rgoal:
-				//val.WriteRune('🐣')
 				val.WriteRune('G')
 			case ogoal:
-				//val.WriteRune('🐥')
 				val.WriteRune('O')
 			case warp:
-				//val.WriteRune('🕳')
 				val.WriteRune('W')
 			}
 
