@@ -106,6 +106,6 @@ Map:
 
 ## Challenge 4: Maze Solver
 
-* Return the soltion of the given map as a set of instructions.
+* Return the solution of the given map as a set of instructions.
 * Create an animated gif showing the how to solve the map
 
