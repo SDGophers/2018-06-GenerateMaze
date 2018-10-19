@@ -28,12 +28,12 @@ const (
 )
 
 const (
-	path = tileType(iota)
-	wall
-	start
-	rgoal
-	ogoal
-	warp
+	Path = tileType(iota)
+	Wall
+	Start
+	Rgoal
+	Ogoal
+	Warp
 )
 
 const (
@@ -61,6 +61,10 @@ type Map struct {
 }
 
 func (m *Map) idxFor(x, y byte) int { return (int(y) * int(m.w)) + int(x) }
+func (m *Map) xyFor(idx int) (byte, byte) {
+	x := idx % m.w
+	y := idx / m.w
+}
 
 func ReadMap(r io.Reader) (*Map, error) {
 
@@ -123,7 +127,7 @@ func ReadMap(r io.Reader) (*Map, error) {
 
 			// Check to see if the the most sigificent bit is set.
 			if (b<<j)&MSb != 0 {
-				m.tiles[m.idxFor(w, h)] = wall
+				m.tiles[m.idxFor(w, h)] = Wall
 			}
 
 			w++
@@ -135,10 +139,10 @@ func ReadMap(r io.Reader) (*Map, error) {
 	if err = binary.Read(r, bom, &m.start); err != nil {
 		return nil, err
 	}
-	if m.tiles[m.idxFor(m.start[0], m.start[1])] != path {
+	if m.tiles[m.idxFor(m.start[0], m.start[1])] != Path {
 		return nil, ErrInvalidMapInvalidStart
 	}
-	m.tiles[m.idxFor(m.start[0], m.start[1])] = start
+	m.tiles[m.idxFor(m.start[0], m.start[1])] = Start
 
 	var numberItems byte
 	if err = binary.Read(r, bom, &numberItems); err != nil {
@@ -155,19 +159,19 @@ func ReadMap(r io.Reader) (*Map, error) {
 
 		idx := m.idxFor(it.X, it.Y)
 
-		if m.tiles[idx] != path {
+		if m.tiles[idx] != Path {
 			return nil, errors.New("invalid item location.")
 		}
 
 		switch it.Typ {
 		case itemRequiredGoal:
 			hasRequiredGoal = true
-			m.tiles[idx] = rgoal
+			m.tiles[idx] = Rgoal
 		case itemOptionalGoal:
-			m.tiles[idx] = ogoal
+			m.tiles[idx] = Ogoal
 
 		case itemWarp:
-			m.tiles[idx] = warp
+			m.tiles[idx] = Warp
 			to := make([]byte, 2)
 			if err = binary.Read(r, bom, &to); err != nil {
 				return nil, err
@@ -192,17 +196,17 @@ func (m *Map) String() string {
 		for x := byte(0); x < m.w; x++ {
 			idx := m.idxFor(x, y)
 			switch m.tiles[idx] {
-			case path:
+			case Path:
 				val.WriteRune(' ')
-			case wall:
+			case Wall:
 				val.WriteRune('█')
-			case start:
+			case Start:
 				val.WriteRune('S')
-			case rgoal:
+			case Rgoal:
 				val.WriteRune('G')
-			case ogoal:
+			case Ogoal:
 				val.WriteRune('O')
-			case warp:
+			case Warp:
 				val.WriteRune('W')
 			}
 
